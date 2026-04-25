@@ -3,7 +3,7 @@ import { Editor } from './components/Editor';
 import { Preview } from './components/Preview';
 import { defaultPortfolioData } from './types';
 import type { PortfolioData } from './types';
-import { Download, ExternalLink, X, Rocket, Check } from 'lucide-react';
+import { Download, ExternalLink, X, Rocket, Check, Eye, Edit3 } from 'lucide-react';
 
 const App = () => {
   const [data, setData] = useState<PortfolioData>(defaultPortfolioData);
@@ -12,6 +12,7 @@ const App = () => {
   const [publishedUrl, setPublishedUrl] = useState<string | null>(null);
   const [deployedVercelUrl, setDeployedVercelUrl] = useState<string | null>(null);
   const [sharedData, setSharedData] = useState<PortfolioData | null>(null);
+  const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
 
   // Load initial data
   useEffect(() => {
@@ -140,7 +141,7 @@ const App = () => {
     return (
       <div className="h-screen w-full relative">
         <div className="absolute top-4 left-4 z-50">
-           <a href="/" className="bg-white/80 backdrop-blur text-sm px-4 py-2 rounded-full shadow border hover:bg-white transition-colors">
+           <a href="/" className="bg-white/80 backdrop-blur text-xs md:text-sm px-4 py-2 rounded-full shadow border hover:bg-white transition-colors">
               Create your own portfolio
            </a>
         </div>
@@ -150,8 +151,9 @@ const App = () => {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-100">
-      <div className="w-96 flex flex-col bg-white border-r border-gray-200 overflow-y-auto">
+    <div className="flex flex-col lg:flex-row h-screen overflow-hidden bg-gray-100 relative">
+      {/* Sidebar - Desktop always visible, Mobile tab-dependent */}
+      <div className={`w-full lg:w-96 flex flex-col bg-white border-r border-gray-200 overflow-y-auto ${activeTab === 'edit' ? 'flex' : 'hidden lg:flex'}`}>
         <div className="p-6 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-20">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black text-xl italic shadow-lg shadow-blue-200">P</div>
@@ -161,7 +163,7 @@ const App = () => {
             <button 
               onClick={handlePublish}
               disabled={isPublishing}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold text-sm transition-all disabled:opacity-50 shadow-md shadow-blue-100 active:scale-95"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-3 md:px-4 py-2 rounded-lg font-bold text-xs md:text-sm transition-all disabled:opacity-50 shadow-md shadow-blue-100 active:scale-95"
             >
               {isPublishing ? '...' : 'Publish'}
             </button>
@@ -183,65 +185,76 @@ const App = () => {
         />
       </div>
 
-      <div className="flex-1 relative flex flex-col">
-        <div className="bg-white border-b border-gray-200 h-14 flex items-center justify-between px-6 shadow-sm z-10">
+      {/* Main Content / Preview Area */}
+      <div className={`flex-1 relative flex flex-col h-full ${activeTab === 'preview' ? 'flex' : 'hidden lg:flex'}`}>
+        {/* Top bar over preview */}
+        <div className="bg-white border-b border-gray-200 h-14 flex items-center justify-between px-6 shadow-sm z-10 shrink-0">
           <div className="text-sm font-medium text-gray-500">Live Preview</div>
           <button 
             onClick={handleDownloadHtml}
             className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-md"
           >
             <Download size={16} />
-            <span>Download HTML</span>
+            <span className="hidden sm:inline">Download HTML</span>
           </button>
         </div>
         
+        {/* The Preview Area */}
         <div className="flex-1 overflow-y-auto">
           <Preview data={data} />
         </div>
 
         {/* Success Modal for URL Hash Publish */}
         {publishedUrl && (
-          <div className="absolute bottom-6 right-6 bg-white rounded-lg shadow-xl border border-gray-200 p-6 w-96 animate-in slide-in-from-bottom-5 z-50">
+          <div className="fixed bottom-20 lg:absolute lg:bottom-6 right-6 left-6 lg:left-auto bg-white rounded-lg shadow-2xl border border-gray-200 p-6 lg:w-96 animate-in slide-in-from-bottom-5 z-[60]">
             <button onClick={() => setPublishedUrl(null)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><X size={20} /></button>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Published Successfully!</h3>
-            <p className="text-sm text-gray-600 mb-4">Your portfolio is live via a serverless shareable link.</p>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Published!</h3>
             <div className="bg-gray-50 border border-gray-200 rounded p-3 mb-4 overflow-hidden relative group">
               <input type="text" readOnly value={publishedUrl} className="w-full bg-transparent text-sm font-mono outline-none cursor-text truncate" onClick={(e) => (e.target as HTMLInputElement).select()} />
             </div>
             <a href={publishedUrl} target="_blank" rel="noreferrer" className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors font-medium">
-              <ExternalLink size={18} /> View Portfolio
+              <ExternalLink size={18} /> View
             </a>
           </div>
         )}
 
         {/* Success Modal for Vercel Deployment */}
         {deployedVercelUrl && (
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl border border-gray-100 p-8 w-[450px] z-[100] animate-in fade-in zoom-in-95">
-            <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Check size={32} />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">Deployed to Vercel!</h3>
-            <p className="text-center text-gray-600 mb-8">Your portfolio is now live on your own Vercel account with its own domain.</p>
-            
-            <div className="space-y-3">
-              <a 
-                href={`https://${deployedVercelUrl}`} 
-                target="_blank" 
-                rel="noreferrer" 
-                className="w-full flex items-center justify-center gap-2 bg-black text-white py-3 rounded-xl font-bold hover:bg-gray-900 transition-all shadow-lg shadow-black/10"
-              >
-                <ExternalLink size={18} />
-                Visit Live Site
-              </a>
-              <button 
-                onClick={() => setDeployedVercelUrl(null)}
-                className="w-full py-3 text-gray-500 font-medium hover:text-gray-700"
-              >
-                Back to Editor
-              </button>
+          <div className="fixed inset-0 lg:absolute lg:inset-0 bg-black/50 lg:bg-transparent backdrop-blur-sm lg:backdrop-blur-none flex items-center justify-center z-[100]">
+            <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-6 lg:p-8 w-[90%] max-w-[450px] animate-in fade-in zoom-in-95">
+              <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Check size={32} />
+              </div>
+              <h3 className="text-xl lg:text-2xl font-bold text-gray-900 text-center mb-2">Deployed to Vercel!</h3>
+              <p className="text-center text-sm lg:text-base text-gray-600 mb-8">Your portfolio is now live on your own domain.</p>
+              
+              <div className="space-y-3">
+                <a href={`https://${deployedVercelUrl}`} target="_blank" rel="noreferrer" className="w-full flex items-center justify-center gap-2 bg-black text-white py-3 rounded-xl font-bold hover:bg-gray-900 transition-all shadow-lg shadow-black/10">
+                  <ExternalLink size={18} /> Visit Site
+                </a>
+                <button onClick={() => setDeployedVercelUrl(null)} className="w-full py-3 text-gray-500 font-medium hover:text-gray-700">Back</button>
+              </div>
             </div>
           </div>
         )}
+      </div>
+
+      {/* Mobile Tab Bar */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-gray-200 flex items-center justify-around z-[100] shadow-lg">
+        <button 
+          onClick={() => setActiveTab('edit')}
+          className={`flex flex-col items-center gap-1 ${activeTab === 'edit' ? 'text-blue-600' : 'text-gray-400'}`}
+        >
+          <Edit3 size={20} />
+          <span className="text-[10px] font-bold">Edit</span>
+        </button>
+        <button 
+          onClick={() => setActiveTab('preview')}
+          className={`flex flex-col items-center gap-1 ${activeTab === 'preview' ? 'text-blue-600' : 'text-gray-400'}`}
+        >
+          <Eye size={20} />
+          <span className="text-[10px] font-bold">Preview</span>
+        </button>
       </div>
     </div>
   );
