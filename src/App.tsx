@@ -175,6 +175,8 @@ const App = () => {
         <Editor 
           data={data} 
           onChange={setData} 
+          onPublish={handlePublish}
+          isPublishing={isPublishing}
         />
       </div>
 
