@@ -14,6 +14,21 @@ export interface Project {
   imageUrl?: string;
 }
 
+export interface Experience {
+  id: string;
+  company: string;
+  role: string;
+  duration: string;
+  description: string;
+}
+
+export interface Education {
+  id: string;
+  school: string;
+  degree: string;
+  year: string;
+}
+
 export interface PortfolioData {
   name: string;
   title: string;
@@ -29,6 +44,8 @@ export interface PortfolioData {
   };
   skills: Skill[];
   projects: Project[];
+  experience: Experience[];
+  education: Education[];
   theme: ThemeType;
   primaryColor: string;
   vercelToken?: string;
@@ -64,6 +81,23 @@ export const defaultPortfolioData: PortfolioData = {
       title: 'Weather App',
       description: 'A beautiful weather app built with React and Framer Motion.',
       link: 'https://example.com/weather',
+    }
+  ],
+  experience: [
+    {
+      id: '1',
+      company: 'Tech Innovators Inc.',
+      role: 'Senior Developer',
+      duration: '2021 - Present',
+      description: 'Leading the frontend team to build modern SaaS solutions.'
+    }
+  ],
+  education: [
+    {
+      id: '1',
+      school: 'University of Technology',
+      degree: 'B.S. in Computer Science',
+      year: '2017 - 2021'
     }
   ],
   theme: 'creative',

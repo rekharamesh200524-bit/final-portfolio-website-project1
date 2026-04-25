@@ -1,6 +1,6 @@
 import React from 'react';
-import type { PortfolioData, ThemeType } from '../types';
-import { Plus, Trash2 } from 'lucide-react';
+import type { PortfolioData, ThemeType, Experience, Education } from '../types';
+import { Plus, Trash2, Briefcase, GraduationCap } from 'lucide-react';
 
 interface EditorProps {
   data: PortfolioData;
@@ -9,7 +9,7 @@ interface EditorProps {
   isPublishing: boolean;
 }
 
-export const Editor: React.FC<EditorProps> = ({ data, onChange, onPublish, isPublishing }) => {
+export const Editor: React.FC<EditorProps> = ({ data, onChange }) => {
   const updateField = (field: keyof PortfolioData, value: any) => {
     onChange({ ...data, [field]: value });
   };
@@ -18,286 +18,163 @@ export const Editor: React.FC<EditorProps> = ({ data, onChange, onPublish, isPub
     onChange({ ...data, socialLinks: { ...data.socialLinks, [field]: value } });
   };
 
-  const addSkill = () => {
-    const newSkill = { id: Date.now().toString(), name: 'New Skill', level: 50 };
-    onChange({ ...data, skills: [...data.skills, newSkill] });
+  const addItem = (field: 'skills' | 'projects' | 'experience' | 'education') => {
+    let newItem: any;
+    if (field === 'skills') newItem = { id: Date.now().toString(), name: 'New Skill', level: 50 };
+    if (field === 'projects') newItem = { id: Date.now().toString(), title: 'New Project', description: 'Description', link: '#' };
+    if (field === 'experience') newItem = { id: Date.now().toString(), company: 'Company', role: 'Role', duration: '2020 - 2022', description: 'Work details' };
+    if (field === 'education') newItem = { id: Date.now().toString(), school: 'University', degree: 'Degree', year: '2016 - 2020' };
+    
+    onChange({ ...data, [field]: [...data[field], newItem] });
   };
 
-  const updateSkill = (id: string, field: 'name' | 'level', value: string | number) => {
-    const updatedSkills = data.skills.map(skill => 
-      skill.id === id ? { ...skill, [field]: value } : skill
+  const removeItem = (field: 'skills' | 'projects' | 'experience' | 'education', id: string) => {
+    onChange({ ...data, [field]: (data[field] as any[]).filter(item => item.id !== id) });
+  };
+
+  const updateItem = (field: 'skills' | 'projects' | 'experience' | 'education', id: string, subfield: string, value: any) => {
+    const updated = (data[field] as any[]).map(item => 
+      item.id === id ? { ...item, [subfield]: value } : item
     );
-    onChange({ ...data, skills: updatedSkills });
-  };
-
-  const removeSkill = (id: string) => {
-    onChange({ ...data, skills: data.skills.filter(s => s.id !== id) });
-  };
-
-  const addProject = () => {
-    const newProject = { 
-      id: Date.now().toString(), 
-      title: 'New Project', 
-      description: 'Project description goes here.',
-      link: '#'
-    };
-    onChange({ ...data, projects: [...data.projects, newProject] });
-  };
-
-  const updateProject = (id: string, field: keyof typeof data.projects[0], value: string) => {
-    const updatedProjects = data.projects.map(proj => 
-      proj.id === id ? { ...proj, [field]: value } : proj
-    );
-    onChange({ ...data, projects: updatedProjects });
-  };
-
-  const removeProject = (id: string) => {
-    onChange({ ...data, projects: data.projects.filter(p => p.id !== id) });
+    onChange({ ...data, [field]: updated });
   };
 
   return (
-    <div className="bg-white border-r border-gray-200 h-screen overflow-y-auto w-[400px] flex-shrink-0 flex flex-col">
-
-
-      <div className="p-6 space-y-8 flex-1">
+    <div className="flex-1 overflow-y-auto pb-32"> {/* Added pb-32 for mobile scrolling safety */}
+      <div className="p-6 space-y-10">
         {/* Theme & Color */}
         <section className="space-y-4">
-          <div>
-            <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">Theme</h3>
-            <div className="grid grid-cols-3 gap-2">
-              {(['minimal', 'creative', 'professional'] as ThemeType[]).map((theme) => (
-                <button
-                  key={theme}
-                  onClick={() => updateField('theme', theme)}
-                  className={`p-2 border rounded-md text-sm capitalize transition-colors ${
-                    data.theme === theme 
-                      ? 'border-blue-600 bg-blue-50 text-blue-700 font-medium' 
-                      : 'border-gray-200 hover:border-gray-300 text-gray-600'
-                  }`}
-                >
-                  {theme}
-                </button>
-              ))}
-            </div>
+          <h3 className="text-sm font-bold text-gray-400 uppercase tracking-[0.1em]">Look & Feel</h3>
+          <div className="grid grid-cols-3 gap-2">
+            {(['minimal', 'creative', 'professional'] as ThemeType[]).map((theme) => (
+              <button
+                key={theme}
+                onClick={() => updateField('theme', theme)}
+                className={`p-2 border rounded-xl text-sm capitalize transition-all ${
+                  data.theme === theme 
+                    ? 'border-blue-600 bg-blue-50 text-blue-700 font-bold shadow-sm' 
+                    : 'border-gray-200 hover:border-gray-300 text-gray-500'
+                }`}
+              >
+                {theme}
+              </button>
+            ))}
           </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Primary Accent Color</label>
-            <div className="flex items-center gap-2">
-              <input 
-                type="color" 
-                value={data.primaryColor} 
-                onChange={(e) => updateField('primaryColor', e.target.value)}
-                className="w-10 h-10 rounded cursor-pointer border-0 p-0"
-              />
-              <span className="text-sm font-mono text-gray-500 uppercase">{data.primaryColor}</span>
+          <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-xl border border-gray-100">
+            <input type="color" value={data.primaryColor} onChange={(e) => updateField('primaryColor', e.target.value)} className="w-10 h-10 rounded-lg cursor-pointer border-0 p-0 overflow-hidden" />
+            <div className="flex-1">
+              <label className="block text-[10px] font-bold text-gray-400 uppercase">Accent Color</label>
+              <span className="text-sm font-mono text-gray-600 uppercase">{data.primaryColor}</span>
             </div>
           </div>
         </section>
 
         {/* Basic Info */}
         <section className="space-y-4">
-          <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Personal Info</h3>
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Name</label>
-            <input 
-              type="text" 
-              value={data.name} 
-              onChange={(e) => updateField('name', e.target.value)}
-              className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Title</label>
-            <input 
-              type="text" 
-              value={data.title} 
-              onChange={(e) => updateField('title', e.target.value)}
-              className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Email</label>
-            <input 
-              type="email" 
-              value={data.email} 
-              onChange={(e) => updateField('email', e.target.value)}
-              className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Bio</label>
-            <textarea 
-              value={data.bio} 
-              onChange={(e) => updateField('bio', e.target.value)}
-              rows={4}
-              className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Location</label>
-              <input 
-                type="text" 
-                value={data.location || ''} 
-                onChange={(e) => updateField('location', e.target.value)}
-                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                placeholder="e.g. New York, NY"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Company</label>
-              <input 
-                type="text" 
-                value={data.company || ''} 
-                onChange={(e) => updateField('company', e.target.value)}
-                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                placeholder="e.g. Acme Corp"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Resume Link</label>
-            <input 
-              type="url" 
-              value={data.resumeLink || ''} 
-              onChange={(e) => updateField('resumeLink', e.target.value)}
-              className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-              placeholder="https://link-to-your-resume.pdf"
-            />
+          <h3 className="text-sm font-bold text-gray-400 uppercase tracking-[0.1em]">Personal Details</h3>
+          <div className="space-y-3">
+            <input type="text" placeholder="Full Name" value={data.name} onChange={(e) => updateField('name', e.target.value)} className="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all" />
+            <input type="text" placeholder="Job Title" value={data.title} onChange={(e) => updateField('title', e.target.value)} className="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all" />
+            <textarea placeholder="Tell your story..." value={data.bio} onChange={(e) => updateField('bio', e.target.value)} rows={3} className="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none" />
           </div>
         </section>
 
-        {/* Vercel Deployment Settings */}
-        <section className="bg-blue-50/50 p-4 rounded-lg border border-blue-100">
-          <h3 className="text-sm font-bold text-blue-800 uppercase tracking-wider mb-4 flex items-center gap-2">
-            🚀 Vercel Deployment
+        {/* EXPERIENCE SECTION */}
+        <section className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-[0.1em] flex items-center gap-2">
+              <Briefcase size={16} /> Experience
+            </h3>
+            <button onClick={() => addItem('experience')} className="text-blue-600 hover:bg-blue-50 p-1 rounded-lg transition-colors"><Plus size={20} /></button>
+          </div>
+          {data.experience?.map((exp) => (
+            <div key={exp.id} className="p-4 bg-gray-50 border border-gray-100 rounded-2xl space-y-3 relative group">
+              <button onClick={() => removeItem('experience', exp.id)} className="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition-colors"><Trash2 size={16} /></button>
+              <input type="text" placeholder="Company" value={exp.company} onChange={(e) => updateItem('experience', exp.id, 'company', e.target.value)} className="w-full bg-transparent font-bold text-sm outline-none border-b border-transparent focus:border-blue-200" />
+              <input type="text" placeholder="Role" value={exp.role} onChange={(e) => updateItem('experience', exp.id, 'role', e.target.value)} className="w-full bg-transparent text-sm outline-none border-b border-transparent focus:border-blue-200" />
+              <input type="text" placeholder="Duration (e.g. 2021 - Present)" value={exp.duration} onChange={(e) => updateItem('experience', exp.id, 'duration', e.target.value)} className="w-full bg-transparent text-xs text-gray-400 outline-none" />
+            </div>
+          ))}
+        </section>
+
+        {/* EDUCATION SECTION */}
+        <section className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-[0.1em] flex items-center gap-2">
+              <GraduationCap size={16} /> Education
+            </h3>
+            <button onClick={() => addItem('education')} className="text-blue-600 hover:bg-blue-50 p-1 rounded-lg transition-colors"><Plus size={20} /></button>
+          </div>
+          {data.education?.map((edu) => (
+            <div key={edu.id} className="p-4 bg-gray-50 border border-gray-100 rounded-2xl space-y-2 relative group">
+              <button onClick={() => removeItem('education', edu.id)} className="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition-colors"><Trash2 size={16} /></button>
+              <input type="text" placeholder="School/University" value={edu.school} onChange={(e) => updateItem('education', edu.id, 'school', e.target.value)} className="w-full bg-transparent font-bold text-sm outline-none border-b border-transparent focus:border-blue-200" />
+              <input type="text" placeholder="Degree" value={edu.degree} onChange={(e) => updateItem('education', edu.id, 'degree', e.target.value)} className="w-full bg-transparent text-sm outline-none border-b border-transparent focus:border-blue-200" />
+              <input type="text" placeholder="Year" value={edu.year} onChange={(e) => updateItem('education', edu.id, 'year', e.target.value)} className="w-full bg-transparent text-xs text-gray-400 outline-none" />
+            </div>
+          ))}
+        </section>
+
+        {/* PROJECTS SECTION */}
+        <section className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-[0.1em]">Featured Projects</h3>
+            <button onClick={() => addItem('projects')} className="text-blue-600 hover:bg-blue-50 p-1 rounded-lg transition-colors"><Plus size={20} /></button>
+          </div>
+          {data.projects.map((project) => (
+            <div key={project.id} className="p-4 bg-gray-50 border border-gray-100 rounded-2xl space-y-3 relative group">
+              <button onClick={() => removeItem('projects', project.id)} className="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition-colors"><Trash2 size={16} /></button>
+              <input type="text" placeholder="Project Title" value={project.title} onChange={(e) => updateItem('projects', project.id, 'title', e.target.value)} className="w-full bg-transparent font-bold text-sm outline-none border-b border-transparent focus:border-blue-200" />
+              <textarea placeholder="Describe your work..." value={project.description} onChange={(e) => updateItem('projects', project.id, 'description', e.target.value)} rows={2} className="w-full bg-transparent text-sm outline-none resize-none border-b border-transparent focus:border-blue-200" />
+              <input type="url" placeholder="Project Link" value={project.link} onChange={(e) => updateItem('projects', project.id, 'link', e.target.value)} className="w-full bg-transparent text-xs text-blue-500 outline-none underline" />
+            </div>
+          ))}
+        </section>
+
+        {/* SKILLS SECTION */}
+        <section className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-[0.1em]">Skills</h3>
+            <button onClick={() => addItem('skills')} className="text-blue-600 hover:bg-blue-50 p-1 rounded-lg transition-colors"><Plus size={20} /></button>
+          </div>
+          <div className="grid grid-cols-1 gap-3">
+            {data.skills.map(skill => (
+              <div key={skill.id} className="p-4 bg-gray-50 border border-gray-100 rounded-2xl space-y-3 relative group">
+                <button onClick={() => removeItem('skills', skill.id)} className="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition-colors"><Trash2 size={16} /></button>
+                <input type="text" value={skill.name} onChange={(e) => updateItem('skills', skill.id, 'name', e.target.value)} className="w-full bg-transparent font-bold text-sm outline-none" />
+                <div className="flex items-center gap-4">
+                  <input type="range" min="1" max="100" value={skill.level} onChange={(e) => updateItem('skills', skill.id, 'level', parseInt(e.target.value))} className="flex-1 accent-blue-600" />
+                  <span className="text-xs font-bold text-gray-400 w-8">{skill.level}%</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* VERCEL DEPLOYMENT SECTION */}
+        <section className="bg-black p-6 rounded-[32px] text-white space-y-6 shadow-2xl shadow-black/10">
+          <h3 className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-2 text-gray-400">
+            <Rocket size={18} /> Vercel Cloud
           </h3>
           <div className="space-y-4">
-            <div>
-              <label className="block text-xs font-medium text-blue-700 mb-1">Vercel Project Name</label>
-              <input 
-                type="text" 
-                value={data.vercelProjectName || ''} 
-                onChange={(e) => updateField('vercelProjectName', e.target.value.toLowerCase().replace(/\s+/g, '-'))}
-                className="w-full border border-blue-200 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                placeholder="my-portfolio-site"
-              />
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold uppercase text-gray-500">Vercel Project Name</label>
+              <input type="text" value={data.vercelProjectName || ''} onChange={(e) => updateField('vercelProjectName', e.target.value.toLowerCase().replace(/\s+/g, '-'))} className="w-full bg-gray-900 border border-gray-800 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="my-portfolio-site" />
             </div>
-            <div>
-              <label className="block text-xs font-medium text-blue-700 mb-1">Vercel Access Token</label>
-              <input 
-                type="password" 
-                value={data.vercelToken || ''} 
-                onChange={(e) => updateField('vercelToken', e.target.value)}
-                className="w-full border border-blue-200 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                placeholder="Enter your Vercel Token"
-              />
-              <p className="text-[10px] text-blue-500 mt-1">
-                Generate one at <a href="https://vercel.com/account/tokens" target="_blank" rel="noreferrer" className="underline">vercel.com/account/tokens</a>
-              </p>
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold uppercase text-gray-500">Access Token</label>
+              <input type="password" value={data.vercelToken || ''} onChange={(e) => updateField('vercelToken', e.target.value)} className="w-full bg-gray-900 border border-gray-800 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Paste token here" />
             </div>
           </div>
         </section>
 
         {/* Social Links */}
         <section className="space-y-4">
-          <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Social Links</h3>
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">GitHub URL</label>
-            <input 
-              type="url" 
-              value={data.socialLinks.github || ''} 
-              onChange={(e) => updateSocial('github', e.target.value)}
-              className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-            />
+          <h3 className="text-sm font-bold text-gray-400 uppercase tracking-[0.1em]">Social Profiles</h3>
+          <div className="space-y-3">
+            <input type="url" placeholder="GitHub URL" value={data.socialLinks.github || ''} onChange={(e) => updateSocial('github', e.target.value)} className="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all" />
+            <input type="url" placeholder="LinkedIn URL" value={data.socialLinks.linkedin || ''} onChange={(e) => updateSocial('linkedin', e.target.value)} className="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all" />
           </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">LinkedIn URL</label>
-            <input 
-              type="url" 
-              value={data.socialLinks.linkedin || ''} 
-              onChange={(e) => updateSocial('linkedin', e.target.value)}
-              className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-            />
-          </div>
-        </section>
-
-        {/* Skills */}
-        <section className="space-y-4">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider">Skills</h3>
-            <button onClick={addSkill} className="text-blue-600 hover:bg-blue-50 p-1 rounded transition-colors">
-              <Plus size={18} />
-            </button>
-          </div>
-          {data.skills.map(skill => (
-            <div key={skill.id} className="p-3 bg-gray-50 border border-gray-200 rounded-md space-y-3">
-              <div className="flex gap-2">
-                <input 
-                  type="text" 
-                  value={skill.name} 
-                  onChange={(e) => updateSkill(skill.id, 'name', e.target.value)}
-                  className="flex-1 border border-gray-300 rounded p-1.5 text-sm outline-none focus:border-blue-500"
-                  placeholder="Skill name"
-                />
-                <button onClick={() => removeSkill(skill.id)} className="text-red-500 hover:bg-red-50 p-1.5 rounded">
-                  <Trash2 size={16} />
-                </button>
-              </div>
-              <div className="flex items-center gap-3">
-                <input 
-                  type="range" 
-                  min="1" 
-                  max="100" 
-                  value={skill.level} 
-                  onChange={(e) => updateSkill(skill.id, 'level', parseInt(e.target.value))}
-                  className="flex-1"
-                />
-                <span className="text-xs font-medium text-gray-600 w-8">{skill.level}%</span>
-              </div>
-            </div>
-          ))}
-        </section>
-
-        {/* Projects */}
-        <section className="space-y-4">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider">Projects</h3>
-            <button onClick={addProject} className="text-blue-600 hover:bg-blue-50 p-1 rounded transition-colors">
-              <Plus size={18} />
-            </button>
-          </div>
-          {data.projects.map((project, index) => (
-            <div key={project.id} className="p-3 bg-gray-50 border border-gray-200 rounded-md space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-xs font-bold text-gray-500">Project {index + 1}</span>
-                <button onClick={() => removeProject(project.id)} className="text-red-500 hover:bg-red-50 p-1 rounded">
-                  <Trash2 size={16} />
-                </button>
-              </div>
-              <input 
-                type="text" 
-                value={project.title} 
-                onChange={(e) => updateProject(project.id, 'title', e.target.value)}
-                className="w-full border border-gray-300 rounded p-1.5 text-sm outline-none focus:border-blue-500"
-                placeholder="Project title"
-              />
-              <textarea 
-                value={project.description} 
-                onChange={(e) => updateProject(project.id, 'description', e.target.value)}
-                className="w-full border border-gray-300 rounded p-1.5 text-sm outline-none focus:border-blue-500 resize-none"
-                placeholder="Description"
-                rows={2}
-              />
-              <input 
-                type="url" 
-                value={project.link} 
-                onChange={(e) => updateProject(project.id, 'link', e.target.value)}
-                className="w-full border border-gray-300 rounded p-1.5 text-sm outline-none focus:border-blue-500"
-                placeholder="Project URL"
-              />
-            </div>
-          ))}
         </section>
       </div>
     </div>
