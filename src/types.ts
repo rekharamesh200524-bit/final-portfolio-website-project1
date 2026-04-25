@@ -31,6 +31,8 @@ export interface PortfolioData {
   projects: Project[];
   theme: ThemeType;
   primaryColor: string;
+  vercelToken?: string;
+  vercelProjectName?: string;
 }
 
 export const defaultPortfolioData: PortfolioData = {
@@ -65,5 +67,7 @@ export const defaultPortfolioData: PortfolioData = {
     }
   ],
   theme: 'creative',
-  primaryColor: '#8b5cf6'
+  primaryColor: '#8b5cf6',
+  vercelToken: '',
+  vercelProjectName: 'my-awesome-portfolio'
 };

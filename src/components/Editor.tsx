@@ -176,6 +176,38 @@ export const Editor: React.FC<EditorProps> = ({ data, onChange, onPublish, isPub
           </div>
         </section>
 
+        {/* Vercel Deployment Settings */}
+        <section className="bg-blue-50/50 p-4 rounded-lg border border-blue-100">
+          <h3 className="text-sm font-bold text-blue-800 uppercase tracking-wider mb-4 flex items-center gap-2">
+            🚀 Vercel Deployment
+          </h3>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-medium text-blue-700 mb-1">Vercel Project Name</label>
+              <input 
+                type="text" 
+                value={data.vercelProjectName || ''} 
+                onChange={(e) => updateField('vercelProjectName', e.target.value.toLowerCase().replace(/\s+/g, '-'))}
+                className="w-full border border-blue-200 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                placeholder="my-portfolio-site"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-blue-700 mb-1">Vercel Access Token</label>
+              <input 
+                type="password" 
+                value={data.vercelToken || ''} 
+                onChange={(e) => updateField('vercelToken', e.target.value)}
+                className="w-full border border-blue-200 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                placeholder="Enter your Vercel Token"
+              />
+              <p className="text-[10px] text-blue-500 mt-1">
+                Generate one at <a href="https://vercel.com/account/tokens" target="_blank" rel="noreferrer" className="underline">vercel.com/account/tokens</a>
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* Social Links */}
         <section className="space-y-4">
           <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Social Links</h3>
