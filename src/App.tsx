@@ -97,7 +97,8 @@ const App = () => {
   };
 
   const handleDownloadHtml = () => {
-    const htmlContent = `<!DOCTYPE html>...`; // truncated for brevity but keeping the logic
+    // Basic logic for download
+    const htmlContent = `<!DOCTYPE html><html><body><h1>${data.name}</h1><p>${data.bio}</p></body></html>`;
     const blob = new Blob([htmlContent], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -122,6 +123,7 @@ const App = () => {
 
   return (
     <div className="flex flex-col lg:flex-row h-screen overflow-hidden bg-gray-100 relative">
+      {/* Sidebar / Editor */}
       <div className={`w-full lg:w-96 flex flex-col bg-white border-r border-gray-200 overflow-y-auto ${activeTab === 'edit' ? 'flex' : 'hidden lg:flex'}`}>
         <div className="p-6 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-20">
           <div className="flex items-center gap-2">
@@ -140,6 +142,7 @@ const App = () => {
         <Editor data={data} onChange={setData} onPublish={handlePublish} isPublishing={isPublishing} />
       </div>
 
+      {/* Preview Area */}
       <div className={`flex-1 relative flex flex-col h-full ${activeTab === 'preview' ? 'flex' : 'hidden lg:flex'}`}>
         <div className="bg-white border-b border-gray-200 h-14 flex items-center justify-between px-6 shadow-sm z-10 shrink-0">
           <div className="text-sm font-medium text-gray-500">Live Preview</div>
@@ -148,63 +151,69 @@ const App = () => {
           </button>
         </div>
         <div className="flex-1 overflow-y-auto"><Preview data={data} /></div>
+      </div>
 
-        {/* --- CUSTOM ALERT MODAL --- */}
-        {alert && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4 animate-in fade-in duration-300">
-            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-300">
-              <div className={`p-8 flex flex-col items-center text-center`}>
-                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 ${
-                  alert.type === 'error' ? 'bg-red-50 text-red-500' : 'bg-blue-50 text-blue-500'
-                }`}>
-                  {alert.type === 'error' ? <AlertCircle size={32} /> : <Info size={32} />}
-                </div>
-                <h3 className="text-2xl font-black text-gray-900 mb-2">{alert.title}</h3>
-                <p className="text-gray-500 leading-relaxed">{alert.message}</p>
-                <button 
-                  onClick={() => setAlert(null)}
-                  className="mt-8 w-full py-4 bg-gray-900 hover:bg-black text-white rounded-2xl font-bold transition-all active:scale-95 shadow-xl shadow-gray-200"
-                >
-                  Got it
-                </button>
+      {/* --- ALL MODALS AT ROOT LEVEL SO THEY SHOW REGARDLESS OF TAB --- */}
+      
+      {/* Alert Modal */}
+      {alert && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4 animate-in fade-in duration-300">
+          <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-300">
+            <div className="p-8 flex flex-col items-center text-center">
+              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 ${
+                alert.type === 'error' ? 'bg-red-50 text-red-500' : 'bg-blue-50 text-blue-500'
+              }`}>
+                {alert.type === 'error' ? <AlertCircle size={32} /> : <Info size={32} />}
               </div>
+              <h3 className="text-2xl font-black text-gray-900 mb-2">{alert.title}</h3>
+              <p className="text-gray-500 leading-relaxed">{alert.message}</p>
+              <button 
+                onClick={() => setAlert(null)}
+                className="mt-8 w-full py-4 bg-gray-900 hover:bg-black text-white rounded-2xl font-bold transition-all active:scale-95 shadow-xl shadow-gray-200"
+              >
+                Got it
+              </button>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Success Modals (Published/Deployed) */}
-        {publishedUrl && (
-          <div className="fixed bottom-20 lg:absolute lg:bottom-6 right-6 left-6 lg:left-auto bg-white rounded-3xl shadow-2xl border border-gray-100 p-6 lg:w-96 animate-in slide-in-from-bottom-5 z-[60]">
+      {/* Published URL Modal */}
+      {publishedUrl && (
+        <div className="fixed inset-0 lg:inset-auto bg-black/60 lg:bg-transparent backdrop-blur-sm lg:backdrop-blur-none flex items-center justify-center lg:block z-[200] p-4">
+          <div className="bg-white rounded-[32px] lg:rounded-3xl shadow-2xl border border-gray-100 p-8 lg:p-6 w-full max-w-sm lg:absolute lg:bottom-20 lg:right-6 animate-in slide-in-from-bottom-5">
             <button onClick={() => setPublishedUrl(null)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><X size={20} /></button>
-            <h3 className="text-xl font-black text-gray-900 mb-2">Public Link</h3>
-            <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 mb-4 overflow-hidden relative group">
-              <input type="text" readOnly value={publishedUrl} className="w-full bg-transparent text-sm font-mono outline-none cursor-text truncate" onClick={(e) => (e.target as HTMLInputElement).select()} />
+            <h3 className="text-xl font-black text-gray-900 mb-2 text-center lg:text-left">Public Link</h3>
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 mb-6 overflow-hidden relative group">
+              <input type="text" readOnly value={publishedUrl} className="w-full bg-transparent text-sm font-mono outline-none cursor-text truncate text-center lg:text-left" onClick={(e) => (e.target as HTMLInputElement).select()} />
             </div>
-            <a href={publishedUrl} target="_blank" rel="noreferrer" className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl transition-all font-bold shadow-lg shadow-blue-100">
+            <a href={publishedUrl} target="_blank" rel="noreferrer" className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-4 lg:py-3 rounded-2xl lg:rounded-xl transition-all font-bold shadow-lg shadow-blue-100">
               <ExternalLink size={18} /> Open Site
             </a>
           </div>
-        )}
+        </div>
+      )}
 
-        {deployedVercelUrl && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-            <div className="bg-white rounded-[40px] shadow-2xl p-8 lg:p-10 w-full max-w-md animate-in fade-in zoom-in-95">
-              <div className="w-20 h-20 bg-green-50 text-green-500 rounded-3xl flex items-center justify-center mx-auto mb-8 rotate-3">
-                <Check size={40} />
-              </div>
-              <h3 className="text-3xl font-black text-gray-900 text-center mb-3">Live on Vercel!</h3>
-              <p className="text-center text-gray-500 mb-10 text-lg">Your portfolio has been successfully deployed to your personal domain.</p>
-              <div className="space-y-4">
-                <a href={`https://${deployedVercelUrl}`} target="_blank" rel="noreferrer" className="w-full flex items-center justify-center gap-3 bg-black text-white py-5 rounded-[24px] font-black text-lg hover:bg-gray-900 transition-all shadow-2xl shadow-black/20 active:scale-95">
-                  <ExternalLink size={20} /> Visit Live Site
-                </a>
-                <button onClick={() => setDeployedVercelUrl(null)} className="w-full py-4 text-gray-400 font-bold hover:text-gray-600 transition-colors">Done</button>
-              </div>
+      {/* Vercel Deployed Modal */}
+      {deployedVercelUrl && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4 animate-in fade-in duration-300">
+          <div className="bg-white rounded-[40px] shadow-2xl p-8 lg:p-10 w-full max-w-md animate-in zoom-in-95 duration-300">
+            <div className="w-20 h-20 bg-green-50 text-green-500 rounded-3xl flex items-center justify-center mx-auto mb-8 rotate-3">
+              <Check size={40} />
+            </div>
+            <h3 className="text-3xl font-black text-gray-900 text-center mb-3">Live on Vercel!</h3>
+            <p className="text-center text-gray-500 mb-10 text-lg leading-relaxed">Your portfolio has been successfully deployed to your personal domain.</p>
+            <div className="space-y-4">
+              <a href={`https://${deployedVercelUrl}`} target="_blank" rel="noreferrer" className="w-full flex items-center justify-center gap-3 bg-black text-white py-5 rounded-[24px] font-black text-lg hover:bg-gray-900 transition-all shadow-2xl shadow-black/20 active:scale-95">
+                <ExternalLink size={20} /> Visit Live Site
+              </a>
+              <button onClick={() => setDeployedVercelUrl(null)} className="w-full py-4 text-gray-400 font-bold hover:text-gray-600 transition-colors">Done</button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
+      {/* Mobile Tab Bar */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-gray-200 flex items-center justify-around z-[100] shadow-lg">
         <button onClick={() => setActiveTab('edit')} className={`flex flex-col items-center gap-1 ${activeTab === 'edit' ? 'text-blue-600' : 'text-gray-400'}`}><Edit3 size={20} /><span className="text-[10px] font-bold">Edit</span></button>
         <button onClick={() => setActiveTab('preview')} className={`flex flex-col items-center gap-1 ${activeTab === 'preview' ? 'text-blue-600' : 'text-gray-400'}`}><Eye size={20} /><span className="text-[10px] font-bold">Preview</span></button>
