@@ -57,16 +57,7 @@ export const Editor: React.FC<EditorProps> = ({ data, onChange, onPublish, isPub
 
   return (
     <div className="bg-white border-r border-gray-200 h-screen overflow-y-auto w-[400px] flex-shrink-0 flex flex-col">
-      <div className="p-6 border-b border-gray-200 bg-gray-50 flex justify-between items-center sticky top-0 z-10">
-        <h2 className="text-xl font-bold text-gray-800">Portfolio Editor</h2>
-        <button 
-          onClick={onPublish}
-          disabled={isPublishing}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
-        >
-          {isPublishing ? 'Publishing...' : 'Publish'}
-        </button>
-      </div>
+
 
       <div className="p-6 space-y-8 flex-1">
         {/* Theme & Color */}

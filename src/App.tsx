@@ -153,12 +153,15 @@ const App = () => {
     <div className="flex h-screen overflow-hidden bg-gray-100">
       <div className="w-96 flex flex-col bg-white border-r border-gray-200 overflow-y-auto">
         <div className="p-6 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-20">
-          <h1 className="text-xl font-bold text-gray-900">Portfolio Editor</h1>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black text-xl italic shadow-lg shadow-blue-200">P</div>
+            <h1 className="text-xl font-black text-gray-900 tracking-tight">Portify</h1>
+          </div>
           <div className="flex gap-2">
             <button 
               onClick={handlePublish}
               disabled={isPublishing}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all disabled:opacity-50"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold text-sm transition-all disabled:opacity-50 shadow-md shadow-blue-100 active:scale-95"
             >
               {isPublishing ? '...' : 'Publish'}
             </button>
@@ -166,7 +169,7 @@ const App = () => {
               onClick={handleDeployToVercel}
               disabled={isDeploying}
               title="Deploy directly to your Vercel account"
-              className="bg-black hover:bg-gray-800 text-white p-2 rounded-lg transition-all disabled:opacity-50"
+              className="bg-black hover:bg-gray-800 text-white p-2 rounded-lg transition-all disabled:opacity-50 shadow-md active:scale-95"
             >
               {isDeploying ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Rocket size={20} />}
             </button>
