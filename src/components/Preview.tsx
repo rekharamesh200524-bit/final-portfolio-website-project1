@@ -1,5 +1,5 @@
 import React from 'react';
-import { PortfolioData } from '../types';
+import type { PortfolioData } from '../types';
 import { MinimalTheme } from './themes/MinimalTheme';
 import { CreativeTheme } from './themes/CreativeTheme';
 import { ProfessionalTheme } from './themes/ProfessionalTheme';

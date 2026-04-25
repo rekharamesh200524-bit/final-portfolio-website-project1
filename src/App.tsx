@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Editor } from './components/Editor';
 import { Preview } from './components/Preview';
-import { PortfolioData, defaultPortfolioData } from './types';
+import { defaultPortfolioData } from './types';
+import type { PortfolioData } from './types';
 import { Download, ExternalLink, X } from 'lucide-react';
 
 const App = () => {

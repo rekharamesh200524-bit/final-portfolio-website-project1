@@ -1,5 +1,5 @@
 import React from 'react';
-import { PortfolioData } from '../../types';
+import type { PortfolioData } from '../../types';
 import { motion } from 'framer-motion';
 
 export const MinimalTheme: React.FC<{ data: PortfolioData }> = ({ data }) => {

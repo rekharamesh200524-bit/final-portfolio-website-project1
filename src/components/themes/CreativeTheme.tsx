@@ -1,5 +1,5 @@
 import React from 'react';
-import { PortfolioData } from '../../types';
+import type { PortfolioData } from '../../types';
 import { motion } from 'framer-motion';
 
 export const CreativeTheme: React.FC<{ data: PortfolioData }> = ({ data }) => {
@@ -90,7 +90,7 @@ export const CreativeTheme: React.FC<{ data: PortfolioData }> = ({ data }) => {
           >
             <h2 className="text-3xl font-black mb-8" style={gradientStyle}>Featured Projects</h2>
             <div className="grid grid-cols-1 gap-8">
-              {data.projects.map((project, index) => (
+              {data.projects.map((project) => (
                 <motion.a 
                   href={project.link} 
                   target="_blank" 
