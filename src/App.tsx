@@ -23,7 +23,8 @@ const App = () => {
         const base64 = hash.replace('#data=', '');
         const decodedString = decodeURIComponent(atob(base64));
         const parsedData = JSON.parse(decodedString);
-        setSharedData(parsedData);
+        // Ensure new fields exist in shared data too
+        setSharedData({ ...defaultPortfolioData, ...parsedData });
         return;
       } catch (err) {
         console.error('Failed to parse shared data', err);
@@ -33,7 +34,14 @@ const App = () => {
     const saved = localStorage.getItem('portfolio-draft');
     if (saved) {
       try {
-        setData(JSON.parse(saved));
+        const parsedSaved = JSON.parse(saved);
+        // CRITICAL: Merge with defaultPortfolioData to ensure new fields (experience, education) are present
+        setData({
+          ...defaultPortfolioData,
+          ...parsedSaved,
+          experience: parsedSaved.experience || defaultPortfolioData.experience,
+          education: parsedSaved.education || defaultPortfolioData.education,
+        });
       } catch (err) {
         console.error('Failed to parse local storage data', err);
       }
@@ -98,7 +106,7 @@ const App = () => {
 
   const handleDownloadHtml = () => {
     // Basic logic for download
-    const htmlContent = `<!DOCTYPE html><html><body><h1>${data.name}</h1><p>${data.bio}</p></body></html>`;
+    const htmlContent = `<!DOCTYPE html><html><head><script src="https://cdn.tailwindcss.com"></script></head><body><div class="p-20"><h1 class="text-4xl font-bold">${data.name}</h1><p>${data.bio}</p></div></body></html>`;
     const blob = new Blob([htmlContent], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -113,7 +121,7 @@ const App = () => {
       <div className="h-screen w-full relative">
         <div className="absolute top-4 left-4 z-50">
            <a href="/" className="bg-white/80 backdrop-blur text-xs md:text-sm px-4 py-2 rounded-full shadow border hover:bg-white transition-colors">
-              Create your own portfolio
+              Create your own portfolio with Folika
            </a>
         </div>
         <Preview data={sharedData} />
@@ -124,11 +132,11 @@ const App = () => {
   return (
     <div className="flex flex-col lg:flex-row h-screen overflow-hidden bg-gray-100 relative">
       {/* Sidebar / Editor */}
-      <div className={`w-full lg:w-96 flex flex-col bg-white border-r border-gray-200 overflow-y-auto ${activeTab === 'edit' ? 'flex' : 'hidden lg:flex'}`}>
+      <div className={`w-full lg:w-96 h-screen flex flex-col bg-white border-r border-gray-200 overflow-hidden ${activeTab === 'edit' ? 'flex' : 'hidden lg:flex'}`}>
         <div className="p-6 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-20">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black text-xl italic shadow-lg shadow-blue-200">P</div>
-            <h1 className="text-xl font-black text-gray-900 tracking-tight">Portify</h1>
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black text-xl italic shadow-lg shadow-blue-200">F</div>
+            <h1 className="text-xl font-black text-gray-900 tracking-tight">Folika</h1>
           </div>
           <div className="flex gap-2">
             <button onClick={handlePublish} disabled={isPublishing} className="bg-blue-600 hover:bg-blue-700 text-white px-3 md:px-4 py-2 rounded-lg font-bold text-xs md:text-sm transition-all disabled:opacity-50 shadow-md active:scale-95">
@@ -153,9 +161,7 @@ const App = () => {
         <div className="flex-1 overflow-y-auto"><Preview data={data} /></div>
       </div>
 
-      {/* --- ALL MODALS AT ROOT LEVEL SO THEY SHOW REGARDLESS OF TAB --- */}
-      
-      {/* Alert Modal */}
+      {/* Alert Modals */}
       {alert && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4 animate-in fade-in duration-300">
           <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-300">
@@ -167,12 +173,7 @@ const App = () => {
               </div>
               <h3 className="text-2xl font-black text-gray-900 mb-2">{alert.title}</h3>
               <p className="text-gray-500 leading-relaxed">{alert.message}</p>
-              <button 
-                onClick={() => setAlert(null)}
-                className="mt-8 w-full py-4 bg-gray-900 hover:bg-black text-white rounded-2xl font-bold transition-all active:scale-95 shadow-xl shadow-gray-200"
-              >
-                Got it
-              </button>
+              <button onClick={() => setAlert(null)} className="mt-8 w-full py-4 bg-gray-900 hover:bg-black text-white rounded-2xl font-bold transition-all active:scale-95 shadow-xl shadow-gray-200">Got it</button>
             </div>
           </div>
         </div>
