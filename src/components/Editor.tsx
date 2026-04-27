@@ -48,7 +48,7 @@ export const Editor: React.FC<EditorProps> = ({ data, onChange }) => {
         <section className="space-y-4">
           <h3 className="text-sm font-bold text-gray-400 uppercase tracking-[0.1em]">Look & Feel</h3>
           <div className="grid grid-cols-3 gap-2">
-            {(['minimal', 'creative', 'professional'] as ThemeType[]).map((theme) => (
+            {(['minimal', 'creative', 'professional', 'modern-sidebar', 'bento'] as ThemeType[]).map((theme) => (
               <button
                 key={theme}
                 onClick={() => updateField('theme', theme)}

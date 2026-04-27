@@ -1,4 +1,4 @@
-export type ThemeType = 'minimal' | 'creative' | 'professional';
+export type ThemeType = 'minimal' | 'creative' | 'professional' | 'modern-sidebar' | 'bento';
 
 export interface Skill {
   id: string;
